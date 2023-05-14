@@ -1,0 +1,72 @@
+@startuml
+
+package "Model" {
+  class Request {
+    +telegram_id
+    +request_type
+  }
+
+  class BookingRequest {
+    +telegram_id
+    +request_type
+    +tableNumber
+    +numberOfGuests
+  }
+
+  class RestaurantInfoRequest {
+    +telegram_id
+    +request_type
+  }
+
+  class MenuRequest {
+    +telegram_id
+    +request_type
+  }
+
+  class FeedbackRequest {
+    +telegram_id
+    +request_type
+    +feedbackText
+  }
+
+  Request <|-- BookingRequest
+  Request <|-- RestaurantInfoRequest
+  Request <|-- MenuRequest
+  Request <|-- FeedbackRequest
+}
+
+package "View" {
+  class TelegramView {
+    +displayMenu()
+    +displayRestaurantInfo()
+    +displayBookingForm()
+    +displayFeedbackForm()
+  }
+}
+
+package "Controller" {
+  class TelegramController {
+    -request: Request
+    -view: TelegramView
+
+    +handleRequest(request: Request)
+  }
+}
+
+class USER {
+  +telegram_id
+}
+
+class AUTHORIZED_USER {
+  +telegram_id
+  +bookTable()
+  +getRestaurantInfo()
+  +getMenu()
+  +giveFeedback()
+}
+
+USER <|-- AUTHORIZED_USER
+TelegramView *-- TelegramController
+TelegramController --> Request
+
+@enduml
