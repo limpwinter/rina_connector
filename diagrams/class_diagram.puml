@@ -1,6 +1,33 @@
 @startuml
 
+
 package "Model" {
+
+class RabbitMQ{
+-Producer
+-Consumer
+}
+class USER {
+  +telegram_id
+}
+
+class AUTHORIZED_USER {
+  +telegram_id
+  +bookTable()
+  +getRestaurantInfo()
+  +getMenu()
+  +giveFeedback()
+}
+  class Response{
+  -telegram_id
+  -type:    String
+  -status:  Bool
+  -text :   String
+  -image:   link_to_image
+
+
+  }
+
   class Request {
     +telegram_id
     +request_type
@@ -45,28 +72,36 @@ package "View" {
 }
 
 package "Controller" {
+
+  class RMQController{
+  +send_request_to_rmq()
+  }
+  class ResponseController{
+  -response:Response
+'  +receive_response_from_rmq()
+  +send_response_to_telegram_controller(response)
+  }
+  class RequestController{
+  -request:Request
+  +send_request_to_rmq_ctrl()
+  }
   class TelegramController {
     -request: Request
     -view: TelegramView
 
-    +handleRequest(request: Request)
+    +create_request(view)
+    +receive_request(request)
+    +send_to_telegram(view)
   }
 }
 
-class USER {
-  +telegram_id
-}
 
-class AUTHORIZED_USER {
-  +telegram_id
-  +bookTable()
-  +getRestaurantInfo()
-  +getMenu()
-  +giveFeedback()
-}
-
+ResponseController -> TelegramController
+ResponseController -- Response
+RequestController -- Request
 USER <|-- AUTHORIZED_USER
 TelegramView *-- TelegramController
 TelegramController --> Request
+RMQController --> RabbitMQ
 
 @enduml
