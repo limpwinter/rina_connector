@@ -3,10 +3,10 @@
 
 package "Model" {
 
-class RabbitMQ{
--Producer
--Consumer
-}
+'class RabbitMQ{
+'-Producer
+'-Consumer
+'}
 class USER {
   +telegram_id
 }
@@ -31,32 +31,43 @@ class AUTHORIZED_USER {
   class Request {
     +telegram_id
     +request_type
+    +to_json()
+  }
+  class MakeOrderRequest{
+  +telegram_id
+    +request_type
+    +to_json()
   }
 
   class BookingRequest {
-    +telegram_id
-    +request_type
+
     +tableNumber
     +numberOfGuests
+     +to_json()
   }
 
   class RestaurantInfoRequest {
     +telegram_id
     +request_type
+     +to_json()
   }
 
   class MenuRequest {
     +telegram_id
     +request_type
+     +to_json()
   }
 
   class FeedbackRequest {
     +telegram_id
     +request_type
     +feedbackText
+     +to_json()
   }
 
   Request <|-- BookingRequest
+  Request <|-- MakeOrderRequest
+
   Request <|-- RestaurantInfoRequest
   Request <|-- MenuRequest
   Request <|-- FeedbackRequest
@@ -71,19 +82,26 @@ package "View" {
   }
 }
 
+package Rina {
+interface RinaAdapter{
+
+}
+
+}
 package "Controller" {
 
-  class RMQController{
-  +send_request_to_rmq()
-  }
+'  class RMQController{
+'  +send_request_to_rmq()
+'  }
   class ResponseController{
   -response:Response
 '  +receive_response_from_rmq()
   +send_response_to_telegram_controller(response)
   }
   class RequestController{
-  -request:Request
-  +send_request_to_rmq_ctrl()
+'  -request:Request
+  +send_request_to_rmq_ctrl(request)
+  +pull_request_from_rmq()
   }
   class TelegramController {
     -request: Request
@@ -102,6 +120,6 @@ RequestController -- Request
 USER <|-- AUTHORIZED_USER
 TelegramView *-- TelegramController
 TelegramController --> Request
-RMQController --> RabbitMQ
+'RMQController --> RabbitMQ
 
 @enduml
