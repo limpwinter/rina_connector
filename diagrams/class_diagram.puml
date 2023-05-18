@@ -65,12 +65,7 @@ class AUTHORIZED_USER {
      +to_json()
   }
 
-  Request <|-- BookingRequest
-  Request <|-- MakeOrderRequest
 
-  Request <|-- RestaurantInfoRequest
-  Request <|-- MenuRequest
-  Request <|-- FeedbackRequest
 }
 
 package "View" {
@@ -84,7 +79,8 @@ package "View" {
 
 package Rina {
 interface RinaAdapter{
-
+push(request)  :   void
+pull()  :   response
 }
 
 }
@@ -94,14 +90,14 @@ package "Controller" {
 '  +send_request_to_rmq()
 '  }
   class ResponseController{
-  -response:Response
 '  +receive_response_from_rmq()
-  +send_response_to_telegram_controller(response)
+  +get_response_from_rina() : Response
+  +send_response_to_telegram(Response)
   }
   class RequestController{
 '  -request:Request
-  +send_request_to_rmq_ctrl(request)
-  +pull_request_from_rmq()
+  +send_request_to_Rina(Request)
+  +pull_request_from_rmq()  :   Request
   }
   class TelegramController {
     -request: Request
@@ -112,14 +108,23 @@ package "Controller" {
     +send_to_telegram(view)
   }
 }
+Request <|-- BookingRequest
+Request <|-- MakeOrderRequest
 
-
-ResponseController -> TelegramController
+Request <|-- RestaurantInfoRequest
+Request <|-- MenuRequest
+Request <|-- FeedbackRequest
+'TelegramView *--
+TelegramController -right-* TelegramView
+'ResponseController -> TelegramController
+RinaAdapter -- RequestController
+RinaAdapter -- ResponseController
+ResponseController - TelegramController
+RequestController -- TelegramController
 ResponseController -- Response
-RequestController -- Request
+RequestController - Request
 USER <|-- AUTHORIZED_USER
-TelegramView *-- TelegramController
-TelegramController --> Request
+'TelegramController --> Request
 'RMQController --> RabbitMQ
 
 @enduml
