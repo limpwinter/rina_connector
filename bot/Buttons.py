@@ -9,7 +9,7 @@ main = [
     ]
 
 rest_info = [
-    [KeyboardButton(text='Назад  🔙')],
+    [KeyboardButton(text='Назад')],
     [KeyboardButton(text='О ресторане')],
     [KeyboardButton(text='Рабочие часы')],
     [KeyboardButton(text='Объявления')],

@@ -64,21 +64,27 @@ async def TryRegUser(message:types.Message):
     if DataBase.UserRegCheck(message.from_user.id):
         await message.answer('Вы уже есть среди пользователей.' , reply_markup=keyboard)
     else:
-        DataBase.InsertUser(message.from_user.id)
-        await message.answer('Добро пожаловать, ' + message.from_user.full_name + '!', reply_markup=keyboard)
+        DataBase.InsertUser(message.from_user.id, False)
+        await message.answer('Добро пожаловать, ' + message.from_user.full_name + '! Вы ещё не авторизованы.', reply_markup=keyboard)
 #endregion
 
 
 #region Кнопки
-@dp.message_handler(Text(equals='Назад  🔙'))
+@dp.message_handler(Text(equals='Назад'))
 async def Back(message:types.Message):    
     keyboard = types.ReplyKeyboardMarkup(keyboard=Buttons.main, resize_keyboard = True)
     await message.answer('Основная страница', reply_markup=keyboard)
 
 @dp.message_handler(Text(equals='Инфо о ресторане'))
-async def MarketPage(message:types.Message):
-    keyboard = types.ReplyKeyboardMarkup(keyboard=Buttons.market, resize_keyboard = True)
+async def RestInfoPage(message:types.Message):
+    keyboard = types.ReplyKeyboardMarkup(keyboard=Buttons.rest_info, resize_keyboard = True)
     await message.answer('Страница инфы о ресторане', reply_markup=keyboard)
+
+
+
+
+
+
 #endregion
 
 
