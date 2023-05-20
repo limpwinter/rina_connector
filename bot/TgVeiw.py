@@ -2,15 +2,8 @@ from aiogram import Bot, types
 from aiogram import Dispatcher
 from aiogram.utils import executor
 from aiogram.dispatcher.filters import Text
-import re
-import requests
-import threading
-import datetime
 import asyncio
-import time
-import numpy as np
 import ast
-import math
 
 import Buttons
 import DataBase
@@ -20,12 +13,7 @@ import DataBase
 BOT_TOKEN = None
 
 def ConvertStringToType(string):
-    # Try to parse the string as a literal
-    try:
-        return ast.literal_eval(string)
-    except:
-        # If it fails, it means the string is a date
-        return datetime.datetime.strptime(string, '%Y-%m-%d %H:%M')
+    return ast.literal_eval(string)
 def LoadParametersFromFile():
     # Open the constants file
     with open('constants.txt') as f:
@@ -69,7 +57,7 @@ async def TryRegUser(message:types.Message):
 #endregion
 
 
-#region Кнопки
+#region Получение сообщений от пользователя
 @dp.message_handler(Text(equals='Назад'))
 async def Back(message:types.Message):    
     keyboard = types.ReplyKeyboardMarkup(keyboard=Buttons.main, resize_keyboard = True)
@@ -81,10 +69,10 @@ async def RestInfoPage(message:types.Message):
     await message.answer('Страница инфы о ресторане', reply_markup=keyboard)
 
 
-
-
-
-
+@dp.message_handler(Text(equals='Инфо о ресторане'))
+async def RestInfoPage(message:types.Message):
+    keyboard = types.ReplyKeyboardMarkup(keyboard=Buttons.rest_info, resize_keyboard = True)
+    await message.answer('Страница инфы о ресторане', reply_markup=keyboard)
 #endregion
 
 
