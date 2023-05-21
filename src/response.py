@@ -7,9 +7,22 @@ class BaseResponseAPI(ABC):
         raise NotImplementedError("Not Implemented")
 
 
+class ResponseSample(BaseResponseAPI):
+    def __init__(self, image, text):
+        self.image = image
+        self.text = text
+
+    def from_json(self, json_file):
+        pass
+
+
 class ResponseController(BaseResponseAPI):
-    def __init__(self, json_file):
-        self.image, self.text = self.from_json(json_file)
+    def __init__(self, response_id: int = 0):
+        self.response_id = response_id
+        self.response = None
+
+    def set_params(self, image, text):
+        self.response = ResponseSample(image, text)
 
     def from_json(self, json_file):
         """
