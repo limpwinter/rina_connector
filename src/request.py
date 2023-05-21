@@ -13,7 +13,7 @@ class MakeOrderRequest(BaseRequestInterface):
         self.number_of_dishes = number_of_dishes
 
     def to_json(self):
-        pass
+        return {'num_of_dishes': self.number_of_dishes}
 
 
 class BookingRequest(BaseRequestInterface):
@@ -22,7 +22,8 @@ class BookingRequest(BaseRequestInterface):
         self.number_of_guests = number_of_guests
 
     def to_json(self):
-        pass
+        return {"table_number": self.table_number,
+                "number_of_guests": self.number_of_guests}
 
 
 class RestaurantInfoRequest(BaseRequestInterface):
@@ -30,7 +31,7 @@ class RestaurantInfoRequest(BaseRequestInterface):
         self.info = info
 
     def to_json(self):
-        pass
+        return {'info': self.info}
 
 
 class MenuRequest(BaseRequestInterface):
@@ -38,7 +39,8 @@ class MenuRequest(BaseRequestInterface):
         self.type_of_menu = type_of_menu
 
     def to_json(self):
-        pass
+        return {"type_of_menu":
+                    self.type_of_menu}
 
 
 class FeedBackRequest(BaseRequestInterface):
@@ -46,7 +48,8 @@ class FeedBackRequest(BaseRequestInterface):
         self.feedback_text = feedback_text
 
     def to_json(self):
-        pass
+        return {"feedback_text":
+                    self.feedback_text}
 
 
 def order_req(*args):
@@ -69,7 +72,7 @@ def feedback_req(*args):
     return FeedBackRequest(*args)
 
 
-class RequestController:
+class RequestController(BaseRequestInterface):
     def __init__(self, user_id: int = 0, request_type: str = 'Menu'):
         self.user_id = user_id
         self.request_obj = None
@@ -87,7 +90,13 @@ class RequestController:
         elif self.request_type == 'Feedback':
             self.request_obj = feedback_req(*args)
 
+    def to_json(self):
+        return {'user_id': self.user_id,
+                'request_type': self.request_type,
+                'annotation': self.request_obj.to_json()
+                }
+
 
 model = RequestController(0, 'Book')
 model.set_params(10, 5)
-print(model.request_obj.number_of_guests)
+print(model.to_json())
