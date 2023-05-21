@@ -1,6 +1,6 @@
 import sqlite3
 
-def CheckIfDBExists():
+def check_if_db_exists():
     sqlite = sqlite3.connect('sqlite_python.sqlite')
     data = sqlite.cursor()
 
@@ -11,7 +11,7 @@ def CheckIfDBExists():
     except:
         return False
 
-def CreateDB():
+def create_db():
     try:
         sqlite_connection = sqlite3.connect('sqlite_python.sqlite')
         cursor = sqlite_connection.cursor()
@@ -30,7 +30,7 @@ def CreateDB():
             sqlite_connection.close()
             print("Соединение с SQLite закрыто")
 
-def CreateTables():
+def create_tables():
     sqlite = sqlite3.connect('sqlite_python.sqlite')
     data = sqlite.cursor()
     data.execute('CREATE TABLE users (telegramId INTEGER, is_authorized BOOL)')
@@ -38,23 +38,28 @@ def CreateTables():
     data.close()
 
 
-def UserRegCheck(telegramId):
+def get_user_auth_status(telegramId):
     sqlite = sqlite3.connect('sqlite_python.sqlite')
     data = sqlite.cursor()
-    data.execute('SELECT telegramId FROM users')
-    value = data.fetchall()
+    data.execute('SELECT telegramId, is_authorized FROM users WHERE telegramId=?', (telegramId,))
+    value = data.fetchone()
     data.close()
 
-    # Превращаем "Список кортежей" в список.
-    value = [x[0] for x in value]
-    if telegramId in value:
-        return True
+    if value is None:
+        return False, False
     else:
-        return False
+        return True, value[1]
 
-def InsertUser(telegramId, is_authorized):
+def add_new_user(telegramId):
     sqlite = sqlite3.connect('sqlite_python.sqlite')
     data = sqlite.cursor()
-    data.execute('INSERT INTO users (telegramId, is_authorized) VALUES (?,?)', (telegramId, is_authorized))
+    data.execute('INSERT INTO users (telegramId, is_authorized) VALUES (?, 0)', (telegramId,))
+    sqlite.commit()
+    data.close()
+    
+def set_user_authorized(telegramId):
+    sqlite = sqlite3.connect('sqlite_python.sqlite')
+    data = sqlite.cursor()
+    data.execute('UPDATE users SET is_authorized=1 WHERE telegramId=?', (telegramId,))
     sqlite.commit()
     data.close()
