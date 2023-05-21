@@ -14,6 +14,8 @@ class ResponseSample(BaseResponseAPI):
 
     def from_json(self, json_file):
         pass
+        # return {'image': self.image,
+        #         'text': self.text}
 
 
 class ResponseController(BaseResponseAPI):
@@ -21,12 +23,13 @@ class ResponseController(BaseResponseAPI):
         self.response_id = response_id
         self.response = None
 
-    def set_params(self, image, text):
+    def from_json(self, json_file):
+        image = json_file['image']
+        text = json_file['text']
         self.response = ResponseSample(image, text)
 
-    def from_json(self, json_file):
-        """
-        KAK KARTINKU V JSONE PEREDAVAT?
-        :param json_file:
-        :return:
-        """
+
+### Example
+model = ResponseController(3)
+model.from_json({'image': 123, 'text': 234})
+print(model.response.image)
