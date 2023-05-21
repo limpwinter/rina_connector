@@ -9,8 +9,8 @@ class BaseRequestInterface(ABC):
 
 
 class MakeOrderRequest(BaseRequestInterface):
-    def __init__(self, user_id: int = 0, request_type: int = 0):
-        self.user_id = user_id
+    def __init__(self, number_of_dishes: list[int] = [1, 2, 3]):
+        self.number_of_dishes = number_of_dishes
 
     def to_json(self):
         pass
@@ -26,24 +26,23 @@ class BookingRequest(BaseRequestInterface):
 
 
 class RestaurantInfoRequest(BaseRequestInterface):
-    def __init__(self, user_id: int = 0, request_type: int = 0):
-        self.user_id = user_id
+    def __init__(self, info: str = 'location'):
+        self.info = info
 
     def to_json(self):
         pass
 
 
 class MenuRequest(BaseRequestInterface):
-    def __init__(self, user_id: int = 0, request_type: int = 0):
-        self.user_id = user_id
+    def __init__(self, type_of_menu: str = 'lunch'):
+        self.type_of_menu = type_of_menu
 
     def to_json(self):
         pass
 
 
 class FeedBackRequest(BaseRequestInterface):
-    def __init__(self, user_id: int = 0, request_type: int = 0, feedback_text: str = 'Well done!'):
-        self.user_id = user_id
+    def __init__(self, feedback_text: str = 'Well done!'):
         self.feedback_text = feedback_text
 
     def to_json(self):
@@ -71,19 +70,24 @@ def feedback_req(*args):
 
 
 class RequestController:
-    def __init__(self, request_type: str = 'Menu'):
-        self.request = request_type
+    def __init__(self, user_id: int = 0, request_type: str = 'Menu'):
+        self.user_id = user_id
+        self.request_obj = None
+        self.request_type = request_type
 
     def set_params(self, *args):
-        if self.request == 'Order':
-            return order_req(*args)
-        elif self.request == 'Book':
-            return book_req(*args)
-        elif self.request == 'RestaurantInfo':
-            return rest_info_req(*args)
-        elif self.request == 'Menu':
-            return menu_req(*args)
-        elif self.request == 'Order':
-            return feedback_req(*args)
+        if self.request_type == 'Order':
+            self.request_obj = order_req(*args)
+        elif self.request_type == 'Book':
+            self.request_obj = book_req(*args)
+        elif self.request_type == 'RestaurantInfo':
+            self.request_obj = rest_info_req(*args)
+        elif self.request_type == 'Menu':
+            self.request_obj = menu_req(*args)
+        elif self.request_type == 'Feedback':
+            self.request_obj = feedback_req(*args)
 
 
+model = RequestController(0, 'Book')
+model.set_params(10, 5)
+print(model.request_obj.number_of_guests)
