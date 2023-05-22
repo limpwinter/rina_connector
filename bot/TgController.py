@@ -1,7 +1,15 @@
-from aiogram import Bot, types, Dispatcher
+from aiogram import types
 
 import DataBase
 import Buttons
+
+
+class Command:
+    def __init__(self, invoke_text, requires_auth):
+        self.invoke_text = invoke_text
+        self.requires_auth = requires_auth
+
+    # def execute
 
 
 class TgController:

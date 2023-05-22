@@ -15,6 +15,7 @@ async def change_keyboard(message:types.Message, button_layout:types.KeyboardBut
     await message.answer(reply, reply_markup=keyboard)
 
 
+
 #region Начало
 
 # Загрузка параметров
@@ -91,14 +92,30 @@ async def on_back(message:types.Message):
         await change_keyboard(message, Buttons.main, 'Основная страница')
     
     if not authorized:
-        await change_keyboard(message, Buttons.main, 'Основная страница')
+        await change_keyboard(message, Buttons.main_nonauth, 'Основная страница (ограниченный функционал))')
 
 @dp.message_handler(Text(equals='Инфо о ресторане'))
 async def on_info(message:types.Message):
     keyboard = types.ReplyKeyboardMarkup(keyboard=Buttons.rest_info, resize_keyboard=True)
     await message.answer('Страница инфы о ресторане', reply_markup=keyboard)
+    
+@dp.message_handler(Text(equals='Заказать столик'))
+async def on_table_typo(message:types.Message):
+    await message.answer(f'''Закажите столик командой: /table (людей) (время) (день)
+    Пример: /table 2 18:30 22.05''')
 
 #endregion
+
+
+#region Реквесты
+
+@dp.message_handler(commands='table')
+async def on_table(message:types.Message):
+    _, people, time, day = message.text.split()
+    # TODO Send request to rina
+    await message.answer(f'''Запрос отправлен в Рину: {[people, time, day]}''')
+
+#endregion  
 
 
 # Запуск бота
