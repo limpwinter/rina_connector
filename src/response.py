@@ -33,3 +33,6 @@ class ResponseController(BaseResponseInterface):
 model = ResponseController(3)
 model.from_json({'image': 123, 'text': 234})
 print(model.response.image)
+
+
+### TEXT/STATUS DA NET
