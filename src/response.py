@@ -1,13 +1,13 @@
 from abc import ABC, abstractmethod
 
 
-class BaseResponseAPI(ABC):
+class BaseResponseInterface(ABC):
     @abstractmethod
     def from_json(self, json_file):
         raise NotImplementedError("Not Implemented")
 
 
-class ResponseSample(BaseResponseAPI):
+class ResponseSample(BaseResponseInterface):
     def __init__(self, image, text):
         self.image = image
         self.text = text
@@ -18,7 +18,7 @@ class ResponseSample(BaseResponseAPI):
         #         'text': self.text}
 
 
-class ResponseController(BaseResponseAPI):
+class ResponseController(BaseResponseInterface):
     def __init__(self, response_id: int = 0):
         self.response_id = response_id
         self.response = None

@@ -72,7 +72,7 @@ def feedback_req(*args):
     return FeedBackRequest(*args)
 
 
-class RequestController(BaseRequestInterface):
+class RequestController:
     def __init__(self, user_id: int = 0, request_type: str = 'Menu'):
         self.user_id = user_id
         self.request_obj = None
