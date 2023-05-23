@@ -96,8 +96,7 @@ async def on_back(message:types.Message):
 
 @dp.message_handler(Text(equals='Инфо о ресторане'))
 async def on_info(message:types.Message):
-    keyboard = types.ReplyKeyboardMarkup(keyboard=Buttons.rest_info, resize_keyboard=True)
-    await message.answer('Страница инфы о ресторане', reply_markup=keyboard)
+    await change_keyboard(message, Buttons.rest_info, 'Страница инфы о ресторане')
     
 @dp.message_handler(Text(equals='Заказать столик'))
 async def on_table_typo(message:types.Message):
@@ -112,13 +111,16 @@ async def on_table_typo(message:types.Message):
 @dp.message_handler(commands='table')
 async def on_table(message:types.Message):
     _, people, time, day = message.text.split()
-    # TODO Send request to rina
+    # RequestController.send_request_to_rina('table', people, time, day) # TODO Send request to rina
     await message.answer(f'''Запрос отправлен в Рину: {[people, time, day]}''')
 
 #endregion  
 
 
-# Запуск бота
+#region Запуск бота
+
 bot_event_loop = asyncio.new_event_loop()
 asyncio.set_event_loop(bot_event_loop)
 bot_event_loop.run_until_complete(executor.start_polling(dp, skip_updates=True))
+
+#endregion  
