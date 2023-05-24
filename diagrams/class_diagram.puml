@@ -19,57 +19,68 @@ class AUTHORIZED_USER {
   +getMenu()
   +giveFeedback()
 }
-  class Response{
-  -telegram_id
-  -type:    String
-  -status:  Bool
-  -text :   String
-  -image:   link_to_image
+  abstract class BaseResponseInterface{
++ from_json()
+}
+class ResponseSample{
++ str image
++ str test
++ from_json()
+}
 
-
+  abstract class BaseRequestInterface {
+    + to_json()
   }
-
-  class Request {
-    +telegram_id
-    +request_type
-    +to_json()
-  }
-  class MakeOrderRequest{
-  +telegram_id
-    +request_type
-    +to_json()
-  }
+class MakeOrderRequest{
++ int number_of_dishes
++ to_json()
+}
 
   class BookingRequest {
 
-    +tableNumber
-    +numberOfGuests
-     +to_json()
++ int table_number
++ int number_of_guests
++ to_json()
   }
 
   class RestaurantInfoRequest {
-    +telegram_id
-    +request_type
-     +to_json()
++ str info
++ to_json()
   }
 
   class MenuRequest {
-    +telegram_id
-    +request_type
-     +to_json()
++ str type_of_menu
++ to_json()
   }
 
   class FeedbackRequest {
-    +telegram_id
-    +request_type
-    +feedbackText
-     +to_json()
++ str feedback_text
++ to_json()
   }
 
 
 }
 
 package "View" {
+class UserInput{
++command
++requires_auth
++controllermethod
++activatied_button_layout
++reg_check()
+change_keyboard_and_reply()
+try_execute()
+on_start()
+on_late_auth()
+on_contact_recieved()
+on_contact_declined()
++on_back()
++on_info()
++on_table_typo()
++on_table()
++on_info_about()
+
+}
   class TelegramView {
     +displayMenu()
     +displayRestaurantInfo()
@@ -87,34 +98,40 @@ pull()  :   response
 }
 package "Controller" {
 
-'  class RMQController{
-'  +send_request_to_rmq()
-'  }
+class RabbitMQ{
+}
   class ResponseController{
 '  +receive_response_from_rmq()
++ int response
++ BaseResponseInterface response
++ from_json()
   +get_response_from_rina() : Response
-  +send_response_to_telegram(Response)
+  +send_response_to_telegram
   }
   class RequestController{
+  + int user_id
++ BaseRequestInterface request_obj
++ str request_type
++ to_json()
++ construct_request()
 '  -request:Request
   +send_request_to_Rina(Request)
-  +pull_request_from_rmq()  :   Request
+  +pull_request_from_rmq()  :   BaseRequestInterface
   }
   class TelegramController {
-    -request: Request
-    -view: TelegramView
 
-    +create_request(view)
-    +receive_request(request)
+    +send_request()
+    +receive_response()
     +send_to_telegram(view)
   }
 }
-Request <|-- BookingRequest
-Request <|-- MakeOrderRequest
+BaseRequestInterface <|-- BookingRequest
+BaseRequestInterface <|-- MakeOrderRequest
 
-Request <|-- RestaurantInfoRequest
-Request <|-- MenuRequest
-Request <|-- FeedbackRequest
+BaseRequestInterface <|-- RestaurantInfoRequest
+BaseRequestInterface <|-- MenuRequest
+BaseRequestInterface <|-- FeedbackRequest
+BaseResponseInterface <|-- ResponseSample
 'TelegramView *--
 TelegramController -right-* TelegramView
 'ResponseController -> TelegramController
@@ -122,10 +139,14 @@ RinaAdapter -- RequestController
 RinaAdapter -- ResponseController
 ResponseController - TelegramController
 RequestController -- TelegramController
-ResponseController -- Response
-RequestController - Request
+ResponseController -- BaseResponseInterface
+RequestController - BaseRequestInterface
+RabbitMQ -- RequestController
+RabbitMQ -- ResponseController
 USER <|-- AUTHORIZED_USER
 'TelegramController --> Request
 'RMQController --> RabbitMQ
 
 @enduml
+
+
