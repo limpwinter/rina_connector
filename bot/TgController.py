@@ -4,12 +4,12 @@ import DataBase
 import Buttons
 
 
-class Command:
-    def __init__(self, invoke_text, requires_auth):
-        self.invoke_text = invoke_text
-        self.requires_auth = requires_auth
+# class Command:
+#     def __init__(self, invoke_text, requires_auth):
+#         self.invoke_text = invoke_text
+#         self.requires_auth = requires_auth
 
-    # def execute
+#     # def execute
 
 
 class TgController:
@@ -27,3 +27,6 @@ class TgController:
         
         if authorized:
             await message.reply('Вы уже авторизованы.')
+
+    async def send_request():
+        

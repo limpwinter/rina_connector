@@ -10,11 +10,6 @@ import DataBase
 from TgController import TgController 
 
 
-async def change_keyboard(message:types.Message, button_layout:types.KeyboardButton, reply:str):    
-    keyboard = types.ReplyKeyboardMarkup(keyboard=button_layout, resize_keyboard=True)
-    await message.answer(reply, reply_markup=keyboard)
-
-
 
 #region Начало
 
@@ -53,6 +48,63 @@ if not DataBase.check_if_db_exists():
     DataBase.create_tables()
 
 #endregion
+
+
+
+
+class UserInput:
+
+    def __init__(self,
+                 command, 
+                 requires_auth = False, 
+                 controller_method = None,
+                 activated_button_layout = None,
+                 reply = None,
+                 ):
+        self.command = command
+        self.requires_auth = requires_auth
+        self.controller_method = controller_method
+        self.activated_button_layout = activated_button_layout
+        self.reply = reply
+
+    def reg_check(self):
+        _, authorized = DataBase.get_user_auth_status(self.telegram_id)
+        return authorized
+    
+    async def change_keyboard_and_reply(self):    
+        keyboard = types.ReplyKeyboardMarkup(keyboard=self.activated_button_layout, resize_keyboard=True)
+        await bot.send_message(self.telegram_id, self.reply, reply_markup=keyboard)
+    
+    async def try_execute(self, message:types.Message):
+
+        self.telegram_id = message.from_id
+        self.invoke_text = message.text
+
+        if self.requires_auth:
+
+            success = self.reg_check()
+            if success:
+                await self.execute()
+            else:
+                await bot.send_message(self.telegram_id, 'Недоступно для неавторизованных пользователей.')
+
+        else:
+            await self.execute()
+
+    async def execute(self):
+
+        self.controller_method()
+
+        if self.activated_button_layout:
+            await self.change_keyboard_and_reply()
+
+# user_inputs = []
+# user_inputs.append( UserInput('/start'), TgController.try_reg_user)
+
+# for user_input in user_inputs:
+
+#     @dp.message_handler(Text(equals='/start'))
+
 
 
 #region Регистрация
@@ -110,9 +162,14 @@ async def on_table_typo(message:types.Message):
 
 @dp.message_handler(commands='table')
 async def on_table(message:types.Message):
-    _, people, time, day = message.text.split()
-    # RequestController.send_request_to_rina('table', people, time, day) # TODO Send request to rina
-    await message.answer(f'''Запрос отправлен в Рину: {[people, time, day]}''')
+    _, number_of_guests, time, day = message.text.split()
+    # TODO Send request to rina
+    await message.answer(f'''Запрос отправлен в Рину: {[number_of_guests, time, day]}''')
+
+@dp.message_handler(Text(equals='О ресторане'))
+async def on_info_about(message:types.Message):
+    # TODO Send request to rina
+    await message.answer(f'''Сейчас расскажем о ресторане!''')
 
 #endregion  
 
