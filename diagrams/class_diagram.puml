@@ -30,9 +30,9 @@ class AUTHORIZED_USER {
   }
 
   class Request {
-    +telegram_id
-    +request_type
-    +to_json()
+'    +telegram_id
+'    +request_type
+    ~to_json()
   }
   class MakeOrderRequest{
   +telegram_id
