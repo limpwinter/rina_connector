@@ -8,6 +8,11 @@ class TgController:
     def __init__(self, view: Callable):
         self.tg_view = view
 
+    def try_create_db():
+        if not DataBase.check_if_db_exists():
+            DataBase.create_db()
+            DataBase.create_tables()
+
     async def try_reg_user(self, telegram_id):
         exists, authorized = DataBase.get_user_auth_status(telegram_id)
         
@@ -24,4 +29,5 @@ class TgController:
     # ... continue with your handlers
 
     async def run(self):
+        TgController.try_create_db()
         await self.tg_view.run()
