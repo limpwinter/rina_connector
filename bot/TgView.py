@@ -34,9 +34,45 @@ class TgView:
 
         @self.dp.message_handler(commands='start')
         async def on_start(message: types.Message):
-            await self.controller.try_reg_user(message.from_user.id)
+            await self.controller.handle_auth(message.from_user.id)
 
-        # ... continue with your handlers
+        @self.dp.message_handler(Text(equals='Авторизоваться'))
+        async def on_late_auth(message: types.Message):
+            await self.controller.handle_auth(message.from_user.id)
+
+        @self.dp.message_handler(content_types=types.ContentType.CONTACT)
+        async def on_contact_received(message: types.Message):
+            await self.controller.handle_contact(message)
+
+        @self.dp.message_handler(Text(equals='Не принимаю'))
+        async def on_contact_declined(message: types.Message):
+            await self.controller.handle_decline(message)
+
+
+
+
+        @self.dp.message_handler(Text(equals='Назад'))
+        async def on_back(message: types.Message):
+            await self.controller.handle_back(message)
+
+        @self.dp.message_handler(Text(equals='Инфо о ресторане'))
+        async def on_info(message: types.Message):
+            await self.controller.handle_info(message)
+
+        @self.dp.message_handler(Text(equals='Заказать столик'))
+        async def on_table_typo(message: types.Message):
+            await self.controller.handle_table_typo(message)
+
+
+
+
+        @self.dp.message_handler(commands='table')
+        async def on_table(message: types.Message):
+            await self.controller.handle_table(message)
+
+        @self.dp.message_handler(Text(equals='О ресторане'))
+        async def on_info_about(message: types.Message):
+            await self.controller.handle_info_about(message)
 
 
 
