@@ -67,7 +67,20 @@ class TgController:
 
 
 
+    async def send_request(telegram_id, text):
+            command = text.split()[0]
+            args = text.split()[1:]
 
+            request_type = command_to_request_dict[command]
+            print(telegram_id, request_type, args)
+            # RequestController.construct_request(telegram_id, request_type, args)
+            
+
+    # # В RequestController-е:
+    # def send_response_to_telegram(ResponseSample):
+    #     TgController.recieve_response(ResponseSample.telegram_id, ResponseSample.text, ResponseSample.image)
+    def recieve_response(telegram_id, text, image=None):
+        TgView.send_message_to_user(telegram_id, text, image)
 
 
 
