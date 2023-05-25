@@ -1,18 +1,16 @@
-from aiogram import Bot, types, Dispatcher, executor
+from aiogram import Bot, types, Dispatcher
 from aiogram.dispatcher.filters import Text
-import asyncio
 from typing import Callable
 
-import Buttons 
 
 class TgView:
+
     def __init__(self, BOT_TOKEN):
         self.bot = Bot(BOT_TOKEN)
         self.dp = Dispatcher(self.bot)
 
     async def set_controller(self, controller: Callable):
         self.controller = controller
-
 
 
 
@@ -28,8 +26,6 @@ class TgView:
 
 
 
-
-
     def register_handlers(self):
 
         @self.dp.message_handler(commands='start')
@@ -42,49 +38,53 @@ class TgView:
 
         @self.dp.message_handler(content_types=types.ContentType.CONTACT)
         async def on_contact_received(message: types.Message):
-            await self.controller.handle_contact(message)
+            await self.controller.handle_contact_recieved(message.from_id, message.contact.phone_number)
 
         @self.dp.message_handler(Text(equals='Не принимаю'))
         async def on_contact_declined(message: types.Message):
-            await self.controller.handle_decline(message)
-
-
-
+            await self.controller.handle_contact_declined(message.from_id)
 
         @self.dp.message_handler(Text(equals='Назад'))
         async def on_back(message: types.Message):
-            await self.controller.handle_back(message)
+            await self.controller.handle_back(message.from_id)
 
         @self.dp.message_handler(Text(equals='Инфо о ресторане'))
         async def on_info(message: types.Message):
-            await self.controller.handle_info(message)
+            await self.controller.handle_info(message.from_id)
 
         @self.dp.message_handler(Text(equals='Заказать столик'))
         async def on_table_typo(message: types.Message):
-            await self.controller.handle_table_typo(message)
+            await self.controller.handle_table_typo(message.from_id)
+
+        @self.dp.message_handler(Text(equals='Ввести данные о себе'))
+        async def on_data_typo(message: types.Message):
+            await self.controller.handle_data_typo(message.from_id)
 
 
+        @self.dp.message_handler(Text(equals='О ресторане'))
+        async def on_info_about(message: types.Message):
+            await self.controller.handle_info_about(message.from_id, message.text)
+            
+        @self.dp.message_handler(Text(equals='Рабочие часы'))
+        async def on_hours(message: types.Message):
+            await self.controller.handle_hours(message.from_id, message.text)
+            
+        @self.dp.message_handler(Text(equals='Объявления'))
+        async def on_news(message: types.Message):
+            await self.controller.handle_news(message.from_id, message.text)
+            
+        @self.dp.message_handler(Text(equals='Меню еды'))
+        async def on_menu(message: types.Message):
+            await self.controller.handle_menu(message.from_id, message.text)
 
 
         @self.dp.message_handler(commands='table')
         async def on_table(message: types.Message):
-            await self.controller.handle_table(message)
+            await self.controller.handle_table(message.from_id, message.text)
 
-        @self.dp.message_handler(Text(equals='О ресторане'))
-        async def on_info_about(message: types.Message):
-            await self.controller.handle_info_about(message)
-
-
-
-
-
-    async def on_auth_new(self, telegram_id):
-        await self.change_keyboard(telegram_id, Buttons.accept_decline, "Нажмите кнопку 'Принять' чтобы передать ваш номер телефона.")                       
-        
-    async def on_auth_existing(self, telegram_id):
-        await self.send_message_to_user(telegram_id, "Вы уже авторизованы.")
-
-
+        @self.dp.message_handler(commands='data')
+        async def on_data(message: types.Message):
+            await self.controller.handle_data(message.from_id, message.text)
 
 
 
