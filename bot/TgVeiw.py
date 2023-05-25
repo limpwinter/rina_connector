@@ -50,61 +50,16 @@ if not DataBase.check_if_db_exists():
 #endregion
 
 
+async def change_keyboard(message, activated_button_layout, reply):    
+    keyboard = types.ReplyKeyboardMarkup(keyboard=activated_button_layout, resize_keyboard=True)
+    await bot.send_message(message.from_id, reply, reply_markup=keyboard)
 
+async def send_message_to_user(telegram_id, text, image):
 
-class UserInput:
-
-    def __init__(self,
-                 command, 
-                 requires_auth = False, 
-                 controller_method = None,
-                 activated_button_layout = None,
-                 reply = None,
-                 ):
-        self.command = command
-        self.requires_auth = requires_auth
-        self.controller_method = controller_method
-        self.activated_button_layout = activated_button_layout
-        self.reply = reply
-
-    def reg_check(self):
-        _, authorized = DataBase.get_user_auth_status(self.telegram_id)
-        return authorized
-    
-    async def change_keyboard_and_reply(self):    
-        keyboard = types.ReplyKeyboardMarkup(keyboard=self.activated_button_layout, resize_keyboard=True)
-        await bot.send_message(self.telegram_id, self.reply, reply_markup=keyboard)
-    
-    async def try_execute(self, message:types.Message):
-
-        self.telegram_id = message.from_id
-        self.invoke_text = message.text
-
-        if self.requires_auth:
-
-            success = self.reg_check()
-            if success:
-                await self.execute()
-            else:
-                await bot.send_message(self.telegram_id, 'Недоступно для неавторизованных пользователей.')
-
-        else:
-            await self.execute()
-
-    async def execute(self):
-
-        self.controller_method()
-
-        if self.activated_button_layout:
-            await self.change_keyboard_and_reply()
-
-# user_inputs = []
-# user_inputs.append( UserInput('/start'), TgController.try_reg_user)
-
-# for user_input in user_inputs:
-
-#     @dp.message_handler(Text(equals='/start'))
-
+    if image:
+        await bot.send_photo(telegram_id, photo=image, caption=text)
+    else:
+        await bot.send_message(telegram_id, text)
 
 
 #region Регистрация
@@ -162,13 +117,12 @@ async def on_table_typo(message:types.Message):
 
 @dp.message_handler(commands='table')
 async def on_table(message:types.Message):
-    _, number_of_guests, time, day = message.text.split()
-    # TODO Send request to rina
-    await message.answer(f'''Запрос отправлен в Рину: {[number_of_guests, time, day]}''')
+    TgController.send_request(message.from_id, message.text)
+    await message.answer(f'''Запрос о бронировании направлен в Рину!''')
 
 @dp.message_handler(Text(equals='О ресторане'))
 async def on_info_about(message:types.Message):
-    # TODO Send request to rina
+    TgController.send_request(message.from_id, message.text)
     await message.answer(f'''Сейчас расскажем о ресторане!''')
 
 #endregion  
