@@ -59,8 +59,12 @@ class TgController:
                                                 f'Пример: /table 2 18:30 22.05')
 
     async def handle_table(self, telegram_id, input_text):
-        await self.send_request(telegram_id, input_text)
-        await self.tg_view.send_message_to_user(telegram_id, '''Запрос о бронировании направлен в Рину!''')
+        _, authorized = DataBase.get_user_auth_status(telegram_id)
+        if authorized:
+            await self.send_request(telegram_id, input_text)
+            await self.tg_view.send_message_to_user(telegram_id, '''Запрос о бронировании направлен в Рину!''')
+        if not authorized:
+            await self.tg_view.send_message_to_user(telegram_id, '''Авторизуйтесь чтобы заказывать столик!''')
 
     async def handle_data_typo(self, telegram_id):
         await self.tg_view.send_message_to_user(telegram_id, 
@@ -68,8 +72,12 @@ class TgController:
                                                 f'Пример: /data Ж нет нет')
 
     async def handle_data(self, telegram_id, input_text):
-        await self.send_request(telegram_id, input_text)
-        await self.tg_view.send_message_to_user(telegram_id, 'Рина надёжно сохранит и учтёт ваши данные!')
+        _, authorized = DataBase.get_user_auth_status(telegram_id)
+        if authorized:
+            await self.send_request(telegram_id, input_text)
+            await self.tg_view.send_message_to_user(telegram_id, 'Рина надёжно сохранит и учтёт ваши данные!')
+        if not authorized:
+            await self.tg_view.send_message_to_user(telegram_id, '''Авторизуйтесь рассказать о себе!''')
 
     async def handle_info_about(self, telegram_id, input_text):
         await self.send_request(telegram_id, input_text)
