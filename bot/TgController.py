@@ -56,31 +56,40 @@ class TgController:
         await self.tg_view.send_message_to_user(message.from_user.id, '''Закажите столик командой: /table (людей) (время) (день)\nПример: /table 2 18:30 22.05''')
 
     async def handle_table(self, message):
-        TgController.send_request(message.from_user.id, message.text)
+        await self.send_request(message.from_user.id, message.text)
         await self.tg_view.send_message_to_user(message.from_user.id, '''Запрос о бронировании направлен в Рину!''')
 
     async def handle_info_about(self, message):
-        TgController.send_request(message.from_user.id, message.text)
+        await self.send_request(message.from_user.id, message.text)
         await self.tg_view.send_message_to_user(message.from_user.id, '''Сейчас расскажем о ресторане!''')
 
 
 
+    command_to_request_dict = {
+        '/table': 'Book',
+        'О ресторане': 'RestaurantInfo',
+        'Меню еды': 'Menu',
+        'Оставить обратную связь': 'Feedback',
+    }
 
+    async def send_request(self, telegram_id, input_text):
+        command = None
+        args = None
 
-    async def send_request(telegram_id, text):
-            command = text.split()[0]
-            args = text.split()[1:]
+        if input_text in self.command_to_request_dict:
+            command = input_text
+        else:
+            command, *args = input_text.split()
 
-            request_type = command_to_request_dict[command]
-            print(telegram_id, request_type, args)
+        request_type = self.command_to_request_dict.get(command)
+        if request_type:
+            print(f'Отправлен запрос: {telegram_id, request_type, args}.')
             # RequestController.construct_request(telegram_id, request_type, args)
-            
+        else:
+            print(f'Команда {command} неизвестна.')
 
-    # # В RequestController-е:
-    # def send_response_to_telegram(ResponseSample):
-    #     TgController.recieve_response(ResponseSample.telegram_id, ResponseSample.text, ResponseSample.image)
-    def recieve_response(telegram_id, text, image=None):
-        TgView.send_message_to_user(telegram_id, text, image)
+    async def receive_response(self, telegram_id, text, image=None):
+        await self.tg_view.send_message_to_user(telegram_id, text, image)
 
 
 
