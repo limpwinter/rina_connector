@@ -1,17 +1,12 @@
 from aiogram import types
+from TgView import TgView
 import DataBase
 import Buttons
-
-command_to_request_dict = {
-    '/table': 'Book',
-    'О ресторане': 'RestaurantInfo',
-    'Меню еды': 'Menu',
-    'Оставить обратную связь': 'Feedback',
-}
+from typing import Callable
 
 class TgController:
-    def __init__(self, tg_view):
-        self.tg_view = tg_view
+    def __init__(self, view: Callable):
+        self.tg_view = view
 
     async def try_reg_user(self, telegram_id):
         exists, authorized = DataBase.get_user_auth_status(telegram_id)
@@ -21,18 +16,12 @@ class TgController:
             exists = True
         
         if exists and not authorized:
-            await self.tg_view.on_auth_new()
+            await self.tg_view.on_auth_new(telegram_id)
 
         if authorized:
-            await self.tg_view.on_auth_existing()
+            await self.tg_view.on_auth_existing(telegram_id)
 
-    async def send_request(self, telegram_id, text):
-        command = text.split()[0]
-        args = text.split()[1:]
+    # ... continue with your handlers
 
-        request_type = command_to_request_dict[command]
-        print(telegram_id, request_type, args)
-        # RequestController.construct_request(telegram_id, request_type, args)
-        
-    def recieve_response(self, telegram_id, text, image=None):
-        self.tg_view.send_message_to_user(telegram_id, text, image)
+    async def run(self):
+        await self.tg_view.run()
