@@ -62,31 +62,19 @@ class MakeOrderRequest{
 }
 
 package "View" {
-class UserInput{
-+command
-+requires_auth
-+controllermethod
-+activatied_button_layout
-+reg_check()
-change_keyboard_and_reply()
-try_execute()
-on_start()
-on_late_auth()
-on_contact_recieved()
-on_contact_declined()
-+on_back()
-+on_info()
-+on_table_typo()
-+on_table()
-+on_info_about()
-
+class "TgView" {
+  -bot: Bot
+  -dp: Dispatcher
+  -controller: Callable
+  +set_controller(controller: Callable): void
+  +change_keyboard(telegram_id: int, activated_button_layout: List, reply: str): void
+  +send_message_to_user(telegram_id: int, text: str, image: str): void
+  +register_handlers(): void
+  +start_bot(): void
+  +run(): void
 }
-  class TelegramView {
-    +displayMenu()
-    +displayRestaurantInfo()
-    +displayBookingForm()
-    +displayFeedbackForm()
-  }
+
+
 }
 
 package Rina {
@@ -118,12 +106,30 @@ class RabbitMQ{
   +send_request_to_Rina(Request)
   +pull_request_from_rmq()  :   BaseRequestInterface
   }
-  class TelegramController {
+  class "TgController" {
+  -tg_view: Callable
+  -command_request_dict: Dict
+  -try_create_db(): void
 
-    +send_request()
-    +receive_response()
-    +send_to_telegram(view)
-  }
+  +handle_auth(telegram_id: int): void
+  +handle_contact_recieved(telegram_id: int, phone_number: str): void
+  +handle_contact_declined(telegram_id: int): void
+  +handle_back(telegram_id: int): void
+  +handle_info(telegram_id: int): void
+  +handle_table_typo(telegram_id: int): void
+  +handle_table(telegram_id: int, input_text: str): void
+  +handle_data_typo(telegram_id: int): void
+  +handle_data(telegram_id: int, input_text: str): void
+  +handle_info_about(telegram_id: int, input_text: str): void
+  +handle_hours(telegram_id: int, input_text: str): void
+  +handle_news(telegram_id: int, input_text: str): void
+  +handle_menu(telegram_id: int, input_text: str): void
+  
+  +send_request(telegram_id: int, input_text: str): void
+  +receive_response(telegram_id: int, text: str, image: str): void
+  +run(): void
+}
+
 }
 BaseRequestInterface <|-- BookingRequest
 BaseRequestInterface <|-- MakeOrderRequest
