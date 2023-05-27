@@ -62,7 +62,7 @@ class MakeOrderRequest{
 }
 
 package "View" {
-class "TgView" {
+class "TelegramView" {
   -bot: Bot
   -dp: Dispatcher
   -controller: Callable
@@ -106,7 +106,7 @@ class RabbitMQ{
   +send_request_to_Rina(Request)
   +pull_request_from_rmq()  :   BaseRequestInterface
   }
-  class "TgController" {
+  class "TelegramController" {
   -tg_view: Callable
   -command_request_dict: Dict
   -try_create_db(): void
