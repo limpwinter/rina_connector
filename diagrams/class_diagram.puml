@@ -1,5 +1,5 @@
 @startuml
-
+!pragma layout smetana
 scale  2048 width
 scale  1600 height
 package "Model" {
