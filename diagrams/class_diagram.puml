@@ -4,21 +4,18 @@ scale  2048 width
 scale  1600 height
 package "Model" {
 
-'class RabbitMQ{
-'-Producer
-'-Consumer
-'}
-class USER {
-  +telegram_id
-}
 
-class AUTHORIZED_USER {
-  +telegram_id
-  +bookTable()
-  +getRestaurantInfo()
-  +getMenu()
-  +giveFeedback()
-}
+'class USER {
+'  +telegram_id
+'}
+'
+'class AUTHORIZED_USER {
+'  +telegram_id
+'  +bookTable()
+'  +getRestaurantInfo()
+'  +getMenu()
+'  +giveFeedback()
+'}
   abstract class BaseResponseInterface{
 + from_json()
 }
@@ -86,8 +83,7 @@ pull()  :   response
 }
 package "Controller" {
 
-class RabbitMQ{
-}
+
   class ResponseController{
 '  +receive_response_from_rmq()
 + int response
@@ -147,9 +143,8 @@ ResponseController - TelegramController
 RequestController -- TelegramController
 ResponseController -- BaseResponseInterface
 RequestController - BaseRequestInterface
-RabbitMQ -- RequestController
-RabbitMQ -- ResponseController
-USER <|-- AUTHORIZED_USER
+
+'USER <|-- AUTHORIZED_USER
 'TelegramController --> Request
 'RMQController --> RabbitMQ
 
