@@ -52,6 +52,7 @@ class TgView:
         '/data',
         ]
 
+    # Вспомогательная функция, создаёт детектор сообщений пользователя и что с ними делать 
     def make_handler_with_args(self, handler, include_message_text=False, include_phone_number=False):
         if include_phone_number:
             async def handler_with_args(message: types.Message):
@@ -65,15 +66,19 @@ class TgView:
 
         return handler_with_args
 
+    # При запуске добавляет все детекторы сообщений
     def register_handlers(self):
         
         for command, handler_name in self.COMMANDS_TEXTS_TO_HANDLER_NAMES.items():
+            # Получаем ссылку на метод в контроллере
             handler = self.controller.__getattribute__(handler_name)
 
-            include_message_text = command in self.COMMANDS_INCLUDING_MESSAGE_TEXT
+            # По списку смотрим, передавать ли текст
+            include_message_text = command in self.COMMANDS_INCLUDING_MESSAGE_TEXT  
             
             if command == types.ContentType.CONTACT:
                 handler_with_args = self.make_handler_with_args(handler, include_phone_number=True)
+                # Передаём handler в dispatcher телеграма
                 self.dp.message_handler(content_types=command)(handler_with_args)
 
             elif command.startswith('/'):
