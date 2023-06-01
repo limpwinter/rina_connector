@@ -26,6 +26,16 @@ class TablesDatabase:
             else:
                 print(table)
 
+    def get_availability(self, index):
+        if self.free_tables[index]:
+            return 1
+        else:
+            return 0
+
+    def book_table(self, index):
+        self.free_tables[index] = 1
+        return
+
 
 class RinaController:
     def __init__(self, model=None):
@@ -46,52 +56,51 @@ class RinaController:
         if request_type == 'Order':
             request_obj = self.handle_order(annotation)
         elif request_type == 'Book':
-            request_obj = self.handle_book(annotation)
+            request_obj, status = self.handle_book(annotation)
         elif request_type == 'RestaurantInfo':
-            request_obj = self.handle_info(annotation)
+            request_obj, status = self.handle_info()
         elif request_type == 'Menu':
-            request_obj = self.handle_menu(annotation)
+            request_obj, status = self.handle_menu()
         elif request_type == 'Feedback':
-            request_obj = self.handle_feedback(annotation)
+            status = self.handle_feedback(annotation)
+        else:
+            raise 'What?'
+
+        response = ResponseSample(image='', text=request_obj)
+        return response
 
     def handle_order(self, annotation):
-        """
-
-        :param annotation: json file with configuration
-        :return: 1: success, 0: failure
-        """
-        options = [0, 1]
-        rand_val = random.choice(options)
-        return rand_val
+        dishes = annotation['number_of_dishes']
+        return "Done!", 0
 
     def handle_book(self, annotation):
-        """
+        table_number = annotation['table_number']
+        if self.table_db.get_availability(table_number):
 
-        :param annotation: json file with configuration
-        :return: 1: success, 0: failure
-        """
-        options = [0, 1]
-        rand_val = random.choice(options)
-        return rand_val
+            return 'Trouble while booking', 1
+        else:
+            self.table_db.book_table(table_number)
+            return 'Successfully ordered', 0
 
-    def handle_info(self, annotation):
-        pass
+    def handle_info(self):
+        img_folder = 'https://sun9-73.userapi.com/impf/c855124/v855124307/134ac8/r1OO8GT4M2k.jpg?size=604x417&quality=96&sign=a8e11fd7528f318530ab3b24bdf047f2&type=album'
+        return img_folder, 0
 
     def handle_menu(self):
         img_folder = 'https://park-rovesnik.ru/thumb/2/Bvua2YZKQvHOgcgH9IXaEA/r/d/izobrazhenie_v_menyu_drova_a4_2.jpg'
-        return img_folder
+        return img_folder, 0
 
     def handle_feedback(self, annotation):
         text = annotation['feedback_text']
         self.feedback_db.leave_feedback(text=text)
+        return 0
 
 
 RequestController()
 a = RinaController()
-model = RequestController(321, 'Feedback')
-model.set_params('NEPLOHO')
+model = RequestController(321, 'Book')
+model.set_params(2, 2)
 # print(model.to_json())
 js_resp = model.to_json()
 a.produce_response(js_resp)
 a.produce_response(js_resp)
-a.feedback_db.print_db()
