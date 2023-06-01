@@ -25,66 +25,64 @@ class TgView:
             await self.bot.send_message(telegram_id, text)
 
 
+    COMMANDS_TEXTS_TO_HANDLER_NAMES = {
+        '/start': 'handle_auth',
+        'Авторизоваться': 'handle_auth',
+        'Не принимаю': 'handle_contact_declined',
+        'Назад': 'handle_back',
+        'Инфо о ресторане': 'handle_info',
+        'Заказать столик': 'handle_table_typo',
+        'Ввести данные о себе': 'handle_data_typo',
+
+        types.ContentType.CONTACT: 'handle_contact_recieved',
+
+        'О ресторане': 'handle_info_about',
+        'Рабочие часы': 'handle_hours',
+        'Объявления': 'handle_news',
+        'Меню еды': 'handle_menu',
+        '/table': 'handle_table',
+        '/data': 'handle_data'
+    }
+    COMMANDS_INCLUDING_MESSAGE_TEXT = [
+        'О ресторане',
+        'Рабочие часы',
+        'Объявления',
+        'Меню еды',
+        '/table',
+        '/data',
+        ]
+
+    def make_handler_with_args(self, handler, include_message_text=False, include_phone_number=False):
+        if include_phone_number:
+            async def handler_with_args(message: types.Message):
+                await handler(message.from_user.id, message.contact.phone_number)
+        elif include_message_text:
+            async def handler_with_args(message: types.Message):
+                await handler(message.from_user.id, message.text)
+        else:
+            async def handler_with_args(message: types.Message):
+                await handler(message.from_user.id)
+
+        return handler_with_args
 
     def register_handlers(self):
+        
+        for command, handler_name in self.COMMANDS_TEXTS_TO_HANDLER_NAMES.items():
+            handler = self.controller.__getattribute__(handler_name)
 
-        @self.dp.message_handler(commands='start')
-        async def on_start(message: types.Message):
-            await self.controller.handle_auth(message.from_user.id)
-
-        @self.dp.message_handler(Text(equals='Авторизоваться'))
-        async def on_late_auth(message: types.Message):
-            await self.controller.handle_auth(message.from_user.id)
-
-        @self.dp.message_handler(content_types=types.ContentType.CONTACT)
-        async def on_contact_received(message: types.Message):
-            await self.controller.handle_contact_recieved(message.from_id, message.contact.phone_number)
-
-        @self.dp.message_handler(Text(equals='Не принимаю'))
-        async def on_contact_declined(message: types.Message):
-            await self.controller.handle_contact_declined(message.from_id)
-
-        @self.dp.message_handler(Text(equals='Назад'))
-        async def on_back(message: types.Message):
-            await self.controller.handle_back(message.from_id)
-
-        @self.dp.message_handler(Text(equals='Инфо о ресторане'))
-        async def on_info(message: types.Message):
-            await self.controller.handle_info(message.from_id)
-
-        @self.dp.message_handler(Text(equals='Заказать столик'))
-        async def on_table_typo(message: types.Message):
-            await self.controller.handle_table_typo(message.from_id)
-
-        @self.dp.message_handler(Text(equals='Ввести данные о себе'))
-        async def on_data_typo(message: types.Message):
-            await self.controller.handle_data_typo(message.from_id)
-
-
-        @self.dp.message_handler(Text(equals='О ресторане'))
-        async def on_info_about(message: types.Message):
-            await self.controller.handle_info_about(message.from_id, message.text)
+            include_message_text = command in self.COMMANDS_INCLUDING_MESSAGE_TEXT
             
-        @self.dp.message_handler(Text(equals='Рабочие часы'))
-        async def on_hours(message: types.Message):
-            await self.controller.handle_hours(message.from_id, message.text)
+            if command == types.ContentType.CONTACT:
+                handler_with_args = self.make_handler_with_args(handler, include_phone_number=True)
+                self.dp.message_handler(content_types=command)(handler_with_args)
+
+            elif command.startswith('/'):
+                handler_with_args = self.make_handler_with_args(handler, include_message_text=include_message_text)
+                self.dp.message_handler(commands=command.lstrip('/'))(handler_with_args)
             
-        @self.dp.message_handler(Text(equals='Объявления'))
-        async def on_news(message: types.Message):
-            await self.controller.handle_news(message.from_id, message.text)
-            
-        @self.dp.message_handler(Text(equals='Меню еды'))
-        async def on_menu(message: types.Message):
-            await self.controller.handle_menu(message.from_id, message.text)
-
-
-        @self.dp.message_handler(commands='table')
-        async def on_table(message: types.Message):
-            await self.controller.handle_table(message.from_id, message.text)
-
-        @self.dp.message_handler(commands='data')
-        async def on_data(message: types.Message):
-            await self.controller.handle_data(message.from_id, message.text)
+            else:
+                handler_with_args = self.make_handler_with_args(handler, include_message_text=include_message_text)
+                self.dp.message_handler(Text(equals=command))(handler_with_args)
 
 
 
