@@ -1,4 +1,4 @@
-import pika, sys, os
+import pika
 import logging
 
 from rina import RinaController
@@ -35,14 +35,3 @@ class RinaConsumer:
     # Start listening for messages to consume
         channel.start_consuming()
     
-
-
-if __name__ == '__main__':
-    try:
-        RinaConsumer.receive_response_Rina()
-    except KeyboardInterrupt:
-        print("Interrupted")
-        try:
-            sys.exit(0)
-        except SystemExit:
-            os._exit(0)
