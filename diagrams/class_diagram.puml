@@ -1,5 +1,158 @@
 @startuml
 !pragma layout smetana
+
+scale  2048 width
+scale  1600 height
+package "Model" {
+
+
+'class USER {
+'  +telegram_id
+'}
+'
+'class AUTHORIZED_USER {
+'  +telegram_id
+'  +bookTable()
+'  +getRestaurantInfo()
+'  +getMenu()
+'  +giveFeedback()
+'}
+  abstract class BaseResponseInterface{
++ from_json()
+}
+class ResponseSample{
++ str image
++ str test
++ from_json()
+}
+
+  abstract class BaseRequestInterface {
+    + to_json()
+  }
+class MakeOrderRequest{
++ int number_of_dishes
++ to_json()
+}
+
+  class BookingRequest {
+
++ int table_number
++ int number_of_guests
++ to_json()
+  }
+
+  class RestaurantInfoRequest {
++ str info
++ to_json()
+  }
+
+  class MenuRequest {
++ str type_of_menu
++ to_json()
+  }
+
+  class FeedbackRequest {
++ str feedback_text
++ to_json()
+  }
+
+
+}
+
+package "View" {
+class "TelegramView" {
+  -bot: Bot
+  -dp: Dispatcher
+  -controller: Callable
+  +set_controller(controller: Callable): void
+  +change_keyboard(telegram_id: int, activated_button_layout: List, reply: str): void
+  +send_message_to_user(telegram_id: int, text: str, image: str): void
+  +register_handlers(): void
+  +start_bot(): void
+  +run(): void
+}
+
+
+}
+
+package Rina {
+interface RinaAdapter{
+push(request)  :   void
+pull()  :   response
+}
+
+}
+package "Controller" {
+
+
+  class ResponseController{
+'  +receive_response_from_rmq()
++ int response
++ BaseResponseInterface response
++ from_json()
+  +get_response_from_rina() : Response
+  +send_response_to_telegram
+  }
+  class RequestController{
+  + int user_id
++ BaseRequestInterface request_obj
++ str request_type
++ to_json()
++ construct_request()
+'  -request:Request
+  +send_request_to_Rina(Request)
+  +pull_request_from_rmq()  :   BaseRequestInterface
+  }
+  class "TelegramController" {
+  -tg_view: Callable
+  -command_request_dict: Dict
+  -try_create_db(): void
+
+  +handle_auth(telegram_id: int): void
+  +handle_contact_recieved(telegram_id: int, phone_number: str): void
+  +handle_contact_declined(telegram_id: int): void
+  +handle_back(telegram_id: int): void
+  +handle_info(telegram_id: int): void
+  +handle_table_typo(telegram_id: int): void
+  +handle_table(telegram_id: int, input_text: str): void
+  +handle_data_typo(telegram_id: int): void
+  +handle_data(telegram_id: int, input_text: str): void
+  +handle_info_about(telegram_id: int, input_text: str): void
+  +handle_hours(telegram_id: int, input_text: str): void
+  +handle_news(telegram_id: int, input_text: str): void
+  +handle_menu(telegram_id: int, input_text: str): void
+  
+  +send_request(telegram_id: int, input_text: str): void
+  +receive_response(telegram_id: int, text: str, image: str): void
+  +run(): void
+}
+
+}
+BaseRequestInterface <|-- BookingRequest
+BaseRequestInterface <|-- MakeOrderRequest
+
+BaseRequestInterface <|-- RestaurantInfoRequest
+BaseRequestInterface <|-- MenuRequest
+BaseRequestInterface <|-- FeedbackRequest
+BaseResponseInterface <|-- ResponseSample
+'TelegramView *--
+TelegramController -right-* TelegramView
+'ResponseController -> TelegramController
+RinaAdapter -- RequestController
+RinaAdapter -- ResponseController
+ResponseController - TelegramController
+RequestController -- TelegramController
+ResponseController -- BaseResponseInterface
+RequestController - BaseRequestInterface
+
+'USER <|-- AUTHORIZED_USER
+'TelegramController --> Request
+'RMQController --> RabbitMQ
+
+@enduml
+
+
+=======
 'https://plantuml.com/class-diagram
 
 
