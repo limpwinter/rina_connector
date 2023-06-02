@@ -1,4 +1,5 @@
-from JsonController import JsonController
+from model.JsonController import JsonController
+from rmq.RmqController import RmqController
 
 
 class FeedbackDatabase:
@@ -35,44 +36,49 @@ class TablesDatabase:
 
 
 class RinaController:
-    def __init__(self, model=None):
-        self.model = model
+    def __init__(self):
         self.feedback_db = FeedbackDatabase()
         self.table_db = TablesDatabase()
 
-    def produce_response(self, js_resp):
+    def receive_response(self, request_js_str):
         """
 
-        :param js_resp: json from request
-        :return: response_js: response in json format
+        :param request_js_str: request in json_string
+        :return: response_js_str: response in json_string
         """
-        js_resp = JsonController().str_to_dct(js_resp)
-        user_id = js_resp['user_id']
-        request_type = js_resp['request_type']
-        annotation = js_resp['annotation']
+        request_js = JsonController().str_to_dct(request_js_str)
+        
+        user_id = request_js['user_id']
+        request_type = request_js['request_type']
+        annotation = request_js['annotation']
 
         if request_type == 'Order':
-            request_obj, status = self.handle_order(annotation)
+            response_obj, status = self.handle_order(annotation)
 
         elif request_type == 'Book':
-            request_obj, status = self.handle_book(annotation)
+            response_obj, status = self.handle_book(annotation)
 
         elif request_type == 'RestaurantInfo':
-            request_obj, status = self.handle_info()
+            response_obj, status = self.handle_info()
 
         elif request_type == 'Menu':
-            request_obj, status = self.handle_menu()
+            response_obj, status = self.handle_menu()
 
         elif request_type == 'Feedback':
-            request_obj, status = self.handle_feedback(annotation)
+            response_obj, status = self.handle_feedback(annotation)
 
         else:
-            request_obj, status = "Error", 1
+            response_obj, status = "Error", 1
 
-        response_js = {'user_id': user_id, "request_type": request_type,
-                       "annotation": {'text': "Successfuly", "image": request_obj}}
+        response_js = {
+            'user_id': user_id, 
+            "request_type": request_type,
+            "annotation": {'text': "Successfuly", "image": response_obj}
+            }
 
-        return JsonController().dict_to_str(response_js)
+        response_js_str = JsonController().dict_to_str(response_js)
+
+        RmqController.send_to_tg(response_js_str)
 
     def handle_order(self, annotation):
         """
@@ -127,11 +133,3 @@ class RinaController:
         self.feedback_db.leave_feedback(text=text)
         return "https://images.squarespace-cdn.com/content/v1/5f6d8d146cf2e1408ca04fb0/3280e50d-a353-460d-b6b7-b6ef25c22afd/Successfully-black.png", \
                0
-
-# a = RinaController()
-# model = RequestController(321, 'Book')
-# model.set_params(2, 2)
-# # print(model.to_json())
-# js_resp = model.to_json()
-# a.produce_response(js_resp)
-# print(a.produce_response(js_resp))

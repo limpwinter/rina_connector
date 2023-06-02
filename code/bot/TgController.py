@@ -2,7 +2,7 @@ from typing import Callable
 
 import TgDataBase
 import TgButtons
-from RequestController import RequestController
+from model.RequestController import RequestController
 
 from rmq.RmqController import RmqController
 
@@ -127,14 +127,10 @@ class TgController:
             request = RequestController(telegram_id, request_type)
             request.set_params(args)
             request_json = request.to_json()
-            RmqController.push(request_json)
+            RmqController.send_to_rina(request_json)
         else:
             print(f'Команда {command} неизвестна.')
         
-    async def receive_response(self, telegram_id, text, image=None):
-        await self.tg_view.send_message_to_user(telegram_id, text, image)
-
-
 
     async def run(self):
         TgController.try_create_db()

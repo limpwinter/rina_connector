@@ -1,14 +1,23 @@
 from TgProducer import TgProducer
+from TgConsumer import TgConsumer
+from RinaProducer import RinaProducer
 from RinaConsumer import RinaConsumer
 
 
 class RmqController:
-    #must be better called send request/produce, thanks to 
-    def push():
-        TgProducer.send_request_ro_Rina()
-        #return NotImplementedError
-    
-    #must be better called receive request/consume, thanks to 
-    def pull():
-        RinaConsumer.receive_response_Rina()
-        #return NotImplementedError
+
+    @staticmethod
+    def send_to_rina(message_dict):
+        TgProducer.produce(message_dict)
+        
+    @staticmethod
+    def send_to_tg(message_dict):
+        RinaProducer.produce(message_dict)
+
+    @staticmethod
+    def start_consuming_from_rina(controller):
+        TgConsumer.start_consuming(controller)
+        
+    @staticmethod
+    def start_consuming_from_tg(controller):
+        RinaConsumer.start_consuming(controller)

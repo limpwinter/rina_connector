@@ -1,9 +1,8 @@
 import pika
+import json
 
-from model.JsonController import JsonController
 
-
-class TgProducer:
+class RinaProducer:
 
     @staticmethod
     def produce(message_dict):
@@ -17,12 +16,11 @@ class TgProducer:
         connection = pika.BlockingConnection(parameters)
         channel = connection.channel()
         
-        channel.queue_declare(queue='messages_to_rina')
-        message_str = JsonController().dict_to_str(message_dict)
+        channel.queue_declare(queue='messages_to_tg')
         channel.basic_publish(
             exchange='', 
-            routing_key='messages_to_rina',
-            body=message_str
+            routing_key='messages_to_tg', 
+            body=json.dumps(message_dict)
         )
         print(" [x] Sent JSON message.")
 

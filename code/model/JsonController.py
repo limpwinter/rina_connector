@@ -2,6 +2,7 @@ import ast
 
 
 class JsonController:
+    
     def dict_to_str(self, dictionary):
         return str(dictionary)
 
