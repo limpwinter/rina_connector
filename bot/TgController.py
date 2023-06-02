@@ -1,6 +1,8 @@
 import DataBase
 import Buttons
 from typing import Callable
+from request import RequestController
+from RmqController import RmqController
 
 
 class TgController:
@@ -120,7 +122,10 @@ class TgController:
         request_type = self.command_request_dict.get(command)
         if request_type:
             print(f'Отправлен запрос: {telegram_id, request_type, args}.')
-            # RequestController.construct_request(telegram_id, request_type, args)
+            request = RequestController.construct_request(telegram_id, request_type)
+            request.set_params(args)
+            request_json = request.to_json()
+            RmqController.push(request_json)
         else:
             print(f'Команда {command} неизвестна.')
         
