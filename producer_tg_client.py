@@ -1,13 +1,15 @@
 import pika
+import logging
+
 
 class TgProducer:
 
     def send_request_ro_Rina():
         # If you want to have a more secure SSL authentication, use ExternalCredentials object instead
-        credentials = pika.PlainCredentials(username='admin', 
-                                            password='admin', 
+        credentials = pika.PlainCredentials(username='guest', 
+                                            password='guest', 
                                             erase_on_connect=True)
-        parameters = pika.ConnectionParameters(host='5.199.168.22',
+        parameters = pika.ConnectionParameters(host='127.0.0.1',
                                                port=5672,
                                                virtual_host='curr_virtual_host', 
                                                credentials=credentials)
@@ -27,7 +29,7 @@ class TgProducer:
         # so the subsequent publish call will be sent to 
         # a Default exchange that is predeclared by the broker
         channel.basic_publish(exchange='', routing_key='messages_to_rina', body='Hello World!')
-        print(" [x] Sent 'Hello World!'")
+        logging.info(" [x] Sent message")  
 
         # Safely disconnect from RabbitMQ
         connection.close() 

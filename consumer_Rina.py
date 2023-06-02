@@ -1,11 +1,14 @@
 import pika, sys, os
+import logging
+
+from rina import RinaController
 
 class RinaConsumer:
     # script that must be executed forever 
     # until a keyboard interrupt exception is received
     def receive_response_Rina():
-        credentials = pika.PlainCredentials('admin', 'admin')
-        parameters = pika.ConnectionParameters(host='5.199.168.22', 
+        credentials = pika.PlainCredentials('guest', 'guest')
+        parameters = pika.ConnectionParameters(host='127.0.0.1', 
                                                port=5672, 
                                                virtual_host='curr_virtual_host', 
                                                credentials=credentials)
@@ -17,8 +20,10 @@ class RinaConsumer:
         # Since RabbitMQ works asynchronously, every time you receive a message, 
         # a callback function is called. We will simply print the message body to the terminal 
         def callback(ch, method, properties, body):
-            # TODO : process_client_request(body)
-            print(" [x] Received %r" % body)
+            # TODO body to json dict
+            RinaController.produce_response(body)
+            msg_log = "[x] Received %r" % body
+            logging.info(msg_log)  
 
         # Consume a message from a queue. 
         # The auto_ack option simplifies our example, 
