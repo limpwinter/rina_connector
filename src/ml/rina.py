@@ -96,11 +96,10 @@ class RinaController:
         return 0
 
 
-RequestController()
-a = RinaController()
-model = RequestController(321, 'Book')
-model.set_params(2, 2)
-# print(model.to_json())
-js_resp = model.to_json()
-a.produce_response(js_resp)
-a.produce_response(js_resp)
+# a = RinaController()
+# model = RequestController(321, 'Book')
+# model.set_params(2, 2)
+# # print(model.to_json())
+# js_resp = model.to_json()
+# a.produce_response(js_resp)
+# a.produce_response(js_resp)
