@@ -1,5 +1,6 @@
 from src.response import *
 from src.request import *
+from src.json_controller import JsonController
 
 
 class FeedbackDatabase:
@@ -47,6 +48,7 @@ class RinaController:
         :param js_resp: json from request
         :return: response_js: response in json format
         """
+        js_resp = JsonController().str_to_dct(js_resp)
         user_id = js_resp['user_id']
         request_type = js_resp['request_type']
         annotation = js_resp['annotation']
@@ -71,7 +73,8 @@ class RinaController:
 
         response_js = {'user_id': user_id, "request_type": request_type,
                        "annotation": {'text': "Successfuly", "image": request_obj}}
-        return response_js
+
+        return JsonController().dict_to_str(response_js)
 
     def handle_order(self, annotation):
         """
@@ -133,4 +136,4 @@ class RinaController:
 # # print(model.to_json())
 # js_resp = model.to_json()
 # a.produce_response(js_resp)
-# a.produce_response(js_resp)
+# print(a.produce_response(js_resp))
