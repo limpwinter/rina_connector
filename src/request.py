@@ -96,7 +96,6 @@ class RequestController:
                 'annotation': self.request_obj.to_json()
                 }
 
-
 ### EXAMPLE
 # model = RequestController(0, 'Book')
 # model.set_params(10, 5)
