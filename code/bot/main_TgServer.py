@@ -23,7 +23,6 @@ class TgServer():
 
         await tg_view.set_controller(tg_controller)
         await tg_controller.run()
-
         RmqController.start_consuming_from_rina(tg_controller)
 
 if __name__ == '__main__':

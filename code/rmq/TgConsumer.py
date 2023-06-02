@@ -10,7 +10,6 @@ class TgConsumer:
                                                port=5672, 
                                                virtual_host='curr_virtual_host', 
                                                credentials=credentials)
-    
         connection = pika.BlockingConnection(parameters)
         channel = connection.channel()
         channel.queue_declare(queue='messages_to_tg')

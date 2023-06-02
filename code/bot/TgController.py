@@ -1,8 +1,10 @@
 from typing import Callable
+import asyncio
 
 import TgDataBase
 import TgButtons
 from model.RequestController import RequestController
+from model.JsonController import JsonController
 
 from rmq.RmqController import RmqController
 
@@ -131,6 +133,16 @@ class TgController:
         else:
             print(f'Команда {command} неизвестна.')
         
+    async def receive_response(self, response_js_str):
+
+        response_js = JsonController().str_to_dct(response_js_str)
+        
+        telegram_id = response_js['user_id']
+        text = response_js['annotation']['text']
+        image = response_js['annotation']['image']
+
+        await self.tg_view.send_message_to_user(telegram_id, text, image)
+
 
     async def run(self):
         TgController.try_create_db()
