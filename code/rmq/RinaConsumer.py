@@ -1,7 +1,8 @@
 import pika
 import logging
 
-from rina import RinaController
+from rina.RinaController import RinaController
+
 
 class RinaConsumer:
     # script that must be executed forever 

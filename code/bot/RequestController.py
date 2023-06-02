@@ -95,10 +95,3 @@ class RequestController:
                     'request_type': self.request_type,
                     'annotation': self.request_obj.to_json()
                     })
-
-
-### EXAMPLE
-model = RequestController(0, 'Book')
-model.set_params(10, 5)
-print(model.to_json())
-###

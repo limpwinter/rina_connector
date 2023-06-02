@@ -13,7 +13,7 @@ def check_if_db_exists():
 
 def create_db():
     try:
-        sqlite_connection = sqlite3.connect('sqlite_python.sqlite')
+        sqlite_connection = sqlite3.connect('./sqlite_python.sqlite')
         cursor = sqlite_connection.cursor()
         print("База данных создана и успешно подключена к SQLite")
 

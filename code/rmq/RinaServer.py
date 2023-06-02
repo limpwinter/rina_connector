@@ -1,4 +1,4 @@
-from consumer_Rina import RinaConsumer
+from RinaConsumer import RinaConsumer
 
 import sys, os
 

@@ -1,5 +1,5 @@
-from producer_tg_client import TgProducer
-from consumer_Rina import RinaConsumer
+from TgProducer import TgProducer
+from RinaConsumer import RinaConsumer
 
 
 class RmqController:
@@ -12,4 +12,3 @@ class RmqController:
     def pull():
         RinaConsumer.receive_response_Rina()
         #return NotImplementedError
-    

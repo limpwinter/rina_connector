@@ -1,6 +1,4 @@
-from src.response import *
-from src.request import *
-from src.json_controller import JsonController
+from JsonController import JsonController
 
 
 class FeedbackDatabase:
