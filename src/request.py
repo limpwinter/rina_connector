@@ -91,13 +91,14 @@ class RequestController:
             self.request_obj = feedback_req(*args)
 
     def to_json(self):
-        return {'user_id': self.user_id,
-                'request_type': self.request_type,
-                'annotation': self.request_obj.to_json()
-                }
+        return str({'user_id': self.user_id,
+                    'request_type': self.request_type,
+                    'annotation': self.request_obj.to_json()
+                    })
+
 
 ### EXAMPLE
-# model = RequestController(0, 'Book')
-# model.set_params(10, 5)
-# print(model.to_json())
+model = RequestController(0, 'Book')
+model.set_params(10, 5)
+print(model.to_json())
 ###
