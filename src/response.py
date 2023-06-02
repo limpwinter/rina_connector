@@ -8,30 +8,29 @@ class BaseResponseInterface(ABC):
 
 
 class ResponseSample(BaseResponseInterface):
-    def __init__(self, image, text):
-        self.image = image
-        self.text = text
+    def __init__(self):
+        self.image = None
+        self.text = None
 
     def from_json(self, json_file):
-        pass
-        # return {'image': self.image,
-        #         'text': self.text}
+        self.image = json_file['image']
+        self.text = json_file['text']
 
 
-class ResponseController(BaseResponseInterface):
-    def __init__(self, response_id: int = 0):
-        self.response_id = response_id
+class ResponseController:
+    def __init__(self):
+        self.user_id = None
         self.response = None
 
-    def from_json(self, json_file):
-        image = json_file['image']
-        text = json_file['text']
-        self.response = ResponseSample(image, text)
+    def set_params(self, json_file):
+        self.response = ResponseSample()
+        self.user_id = json_file['user_id']
+        js_annotation = json_file['annotation']
+        self.response.from_json(js_annotation)
 
-
-### Example
-# model = ResponseController(3)
-# model.from_json({'image': 123, 'text': 234})
+## Example
+# model = ResponseController()
+# model.set_params({"user_id": 5, "annotation": {'image': 123, 'text': 234}})
 # print(model.response.image)
 
-### TEXT/STATUS DA NET
+## TEXT/STATUS DA NET

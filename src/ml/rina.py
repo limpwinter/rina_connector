@@ -1,8 +1,6 @@
 from src.response import *
 from src.request import *
 
-import random
-
 
 class FeedbackDatabase:
     def __init__(self):
@@ -43,58 +41,91 @@ class RinaController:
         self.feedback_db = FeedbackDatabase()
         self.table_db = TablesDatabase()
 
-    def pull(self, response: ResponseController = None):
-        print("good")
-
-    def push(self, request: RequestController):
-        print(request)
-
     def produce_response(self, js_resp):
+        """
+
+        :param js_resp: json from request
+        :return: response_js: response in json format
+        """
         user_id = js_resp['user_id']
         request_type = js_resp['request_type']
         annotation = js_resp['annotation']
+
         if request_type == 'Order':
-            request_obj = self.handle_order(annotation)
+            request_obj, status = self.handle_order(annotation)
+
         elif request_type == 'Book':
             request_obj, status = self.handle_book(annotation)
+
         elif request_type == 'RestaurantInfo':
             request_obj, status = self.handle_info()
+
         elif request_type == 'Menu':
             request_obj, status = self.handle_menu()
-        elif request_type == 'Feedback':
-            status = self.handle_feedback(annotation)
-        else:
-            raise 'What?'
 
-        response = ResponseSample(image='', text=request_obj)
-        return response
+        elif request_type == 'Feedback':
+            request_obj, status = self.handle_feedback(annotation)
+
+        else:
+            request_obj, status = "Error", 1
+
+        response_js = {'user_id': user_id, "request_type": request_type,
+                       "annotation": {'text': "Successfuly", "image": request_obj}}
+        return response_js
 
     def handle_order(self, annotation):
+        """
+
+        :param annotation: json annotation
+        :return:
+        text: string
+        status : int {0,1}
+        """
         dishes = annotation['number_of_dishes']
-        return "Done!", 0
+        return f"https://images.squarespace-cdn.com/content/v1/5f6d8d146cf2e1408ca04fb0/3280e50d-a353-460d-b6b7-b6ef25c22afd/Successfully-black.png", \
+               0
 
     def handle_book(self, annotation):
+        """
+
+        :param annotation: json annotation
+        :return: text: string
+        status : int {0,1}
+        """
         table_number = annotation['table_number']
         if self.table_db.get_availability(table_number):
 
-            return 'Trouble while booking', 1
+            return 'https://img.industryweek.com/files/base/ebm/industryweek/image/2023/04/failure.6441a1c52787e.png?auto=format,compress&fit=fill&fill=blur&w=1200&h=630', 1
         else:
             self.table_db.book_table(table_number)
-            return 'Successfully ordered', 0
+            return 'https://images.squarespace-cdn.com/content/v1/5f6d8d146cf2e1408ca04fb0/3280e50d-a353-460d-b6b7-b6ef25c22afd/Successfully-black.png', \
+                   0
 
     def handle_info(self):
-        img_folder = 'https://sun9-73.userapi.com/impf/c855124/v855124307/134ac8/r1OO8GT4M2k.jpg?size=604x417&quality=96&sign=a8e11fd7528f318530ab3b24bdf047f2&type=album'
+        """
+        :return: text: string
+        status : int {0,1}
+        """
+        img_folder = 'https://mkevent.ru/wp-content/uploads/2021/04/3-14-1200x675.jpg'
         return img_folder, 0
 
     def handle_menu(self):
+        """
+          :return: text: string
+          status : int {0,1}
+        """
         img_folder = 'https://park-rovesnik.ru/thumb/2/Bvua2YZKQvHOgcgH9IXaEA/r/d/izobrazhenie_v_menyu_drova_a4_2.jpg'
         return img_folder, 0
 
     def handle_feedback(self, annotation):
+        """
+          :return: text: string
+          status : int {0,1}
+          """
         text = annotation['feedback_text']
         self.feedback_db.leave_feedback(text=text)
-        return 0
-
+        return "https://images.squarespace-cdn.com/content/v1/5f6d8d146cf2e1408ca04fb0/3280e50d-a353-460d-b6b7-b6ef25c22afd/Successfully-black.png", \
+               0
 
 # a = RinaController()
 # model = RequestController(321, 'Book')
