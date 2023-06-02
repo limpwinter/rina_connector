@@ -1,5 +1,6 @@
 @startuml
 !pragma layout smetana
+
 scale  2048 width
 scale  1600 height
 package "Model" {
@@ -151,3 +152,72 @@ RequestController - BaseRequestInterface
 @enduml
 
 
+=======
+'https://plantuml.com/class-diagram
+
+
+BaseRequestInterface <|-- MakeOrderRequest
+BaseRequestInterface <|-- BookingRequest
+BaseRequestInterface <|-- RestaurantInfoRequest
+BaseRequestInterface <|-- MenuRequest
+BaseRequestInterface <|-- FeedBackRequest
+
+BaseResponseInterface <|-- ResponseSample
+BaseResponseInterface <|-- ResponseController
+
+
+abstract class  BaseRequestInterface {
+to_json()
+}
+
+class MakeOrderRequest{
+int number_of_dishes
+to_json()
+}
+class BookingRequest{
+int table_number
+int number_of_guests
+to_json()
+}
+
+class RestaurantInfoRequest{
+str info
+to_json()
+}
+
+class MenuRequest{
+str type_of_menu
+to_json()
+}
+
+class FeedBackRequest{
+str feedback_text
+to_json()
+}
+
+
+class RequestController{
+int user_id
+BaseRequestInterface request_obj
+str request_type
+to_json()
+}
+
+abstract class BaseResponseInterface{
+from_json()
+}
+
+class ResponseSample{
+str image
+str test
+from_json()
+}
+
+class ResponseController{
+int response
+BaseResponseInterface response
+from_json()
+}
+
+
+@enduml
