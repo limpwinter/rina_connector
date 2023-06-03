@@ -1,159 +1,184 @@
-@startuml
+@startuml Class Diagram
 !pragma layout smetana
 
 scale  2048 width
-scale  1600 height
+scale  2048 height
+
+
 package "Model" {
 
+  package "Json" {
+    class "JsonController" {
+      +dict_to_str(dictionary: Dict): str
+      +str_to_dct(string: str): Dict
+    }
+  }
 
-'class USER {
-'  +telegram_id
-'}
-'
-'class AUTHORIZED_USER {
-'  +telegram_id
-'  +bookTable()
-'  +getRestaurantInfo()
-'  +getMenu()
-'  +giveFeedback()
-'}
-  abstract class BaseResponseInterface{
-+ from_json()
+  package "Response" {
+    interface "BaseResponseInterface" {
+      +from_json(json_file: Dict): None
+    }
+  
+    class "ResponseSample" {
+      +from_json(json_file: Dict): None
+      +__init__(): None
+    }
+  
+    class "ResponseController" {
+      +set_params(json_file: Dict): None
+      +__init__(): None
+    }
+  }
+
+  package "Request" {
+    interface "BaseRequestInterface" {
+      +to_json(): Dict
+    }
+  
+    class "MakeOrderRequest" {
+      +to_json(): Dict
+      +__init__(number_of_dishes: List[int]): None
+    }
+  
+    class "BookingRequest" {
+      +to_json(): Dict
+      +__init__(table_number: int, number_of_guests: int): None
+    }
+  
+    class "RestaurantInfoRequest" {
+      +to_json(): Dict
+      +__init__(info: str): None
+    }
+  
+    class "MenuRequest" {
+      +to_json(): Dict
+      +__init__(type_of_menu: str): None
+    }
+  
+    class "FeedBackRequest" {
+      +to_json(): Dict
+      +__init__(feedback_text: str): None
+    }
+  
+    class "RequestController" {
+      +set_params(*args): None
+      +to_json(): str
+      +__init__(user_id: int, request_type: str): None
+    }
+  }
+  
 }
-class ResponseSample{
-+ str image
-+ str test
-+ from_json()
-}
-
-  abstract class BaseRequestInterface {
-    + to_json()
-  }
-class MakeOrderRequest{
-+ int number_of_dishes
-+ to_json()
-}
-
-  class BookingRequest {
-
-+ int table_number
-+ int number_of_guests
-+ to_json()
-  }
-
-  class RestaurantInfoRequest {
-+ str info
-+ to_json()
-  }
-
-  class MenuRequest {
-+ str type_of_menu
-+ to_json()
-  }
-
-  class FeedbackRequest {
-+ str feedback_text
-+ to_json()
-  }
 
 
-}
 
 package "View" {
-class "TelegramView" {
-  -bot: Bot
-  -dp: Dispatcher
-  -controller: Callable
-  +set_controller(controller: Callable): void
-  +change_keyboard(telegram_id: int, activated_button_layout: List, reply: str): void
-  +send_message_to_user(telegram_id: int, text: str, image: str): void
-  +register_handlers(): void
-  +start_bot(): void
-  +run(): void
-}
-
-
-}
-
-package Rina {
-interface RinaAdapter{
-push(request)  :   void
-pull()  :   response
-}
-
-}
-package "Controller" {
-
-
-  class ResponseController{
-'  +receive_response_from_rmq()
-+ int response
-+ BaseResponseInterface response
-+ from_json()
-  +get_response_from_rina() : Response
-  +send_response_to_telegram
+  class "TgView" {
+    -bot: Bot
+    -dp: Dispatcher
+    -controller: Callable
+    -COMMANDS_TEXTS_TO_HANDLER_NAMES: Dict
+    -COMMANDS_INCLUDING_MESSAGE_TEXT: List
+    +set_controller(controller: Callable): void
+    +change_keyboard(telegram_id: int, activated_button_layout: any, reply: str): void
+    +send_message_to_user(telegram_id: int, text: str, image: str): void
+    +make_handler_with_args(handler: Callable, include_message_text: bool, include_phone_number: bool): Callable
+    +register_handlers(): void
+    +start_bot(): void
+    +run(): void
   }
-  class RequestController{
-  + int user_id
-+ BaseRequestInterface request_obj
-+ str request_type
-+ to_json()
-+ construct_request()
-'  -request:Request
-  +send_request_to_Rina(Request)
-  +pull_request_from_rmq()  :   BaseRequestInterface
-  }
-  class "TelegramController" {
-  -tg_view: Callable
-  -command_request_dict: Dict
-  -try_create_db(): void
+}
 
-  +handle_auth(telegram_id: int): void
-  +handle_contact_recieved(telegram_id: int, phone_number: str): void
-  +handle_contact_declined(telegram_id: int): void
-  +handle_back(telegram_id: int): void
-  +handle_info(telegram_id: int): void
-  +handle_table_typo(telegram_id: int): void
-  +handle_table(telegram_id: int, input_text: str): void
-  +handle_data_typo(telegram_id: int): void
-  +handle_data(telegram_id: int, input_text: str): void
-  +handle_info_about(telegram_id: int, input_text: str): void
-  +handle_hours(telegram_id: int, input_text: str): void
-  +handle_news(telegram_id: int, input_text: str): void
-  +handle_menu(telegram_id: int, input_text: str): void
+
+
+package "Rina" {
+  class "FeedbackDatabase" {
+    +leave_feedback(text: str): None
+    +print_db(): None
+  }
   
-  +send_request(telegram_id: int, input_text: str): void
-  +receive_response(telegram_id: int, text: str, image: str): void
-  +run(): void
+  class "TablesDatabase" {
+    +print_free_tables(): None
+    +get_availability(index: int): int
+    +book_table(index: int): None
+    +__init__()
+  }
+  
+  class "RinaController" {
+    +receive_response(request_js_str: str): None
+    +handle_order(annotation: Dict): Tuple[str, int]
+    +handle_book(annotation: Dict): Tuple[str, int]
+    +handle_info(): Tuple[str, int]
+    +handle_menu(): Tuple[str, int]
+    +handle_feedback(annotation: Dict): Tuple[str, int]
+    +__init__()
+  }
+  
+  class "RinaServer" {
+    +start_server(): None
+  }
 }
 
+
+
+package "Controller" {
+  
+  class "TgServer" {
+    +{static}start_server(): Coroutine[None, None, None]
+  }
+
+  class "TgController" {
+    -tg_view: Callable
+    -command_request_dict: Dict
+    +try_create_db(): void
+    +handle_auth(telegram_id: int): void
+    +handle_contact_recieved(telegram_id: int, phone_number: str): void
+    +handle_contact_declined(telegram_id: int): void
+    +handle_back(telegram_id: int): void
+    +handle_info(telegram_id: int): void
+    +handle_table_typo(telegram_id: int): void
+    +handle_table(telegram_id: int, input_text: str): void
+    +handle_data_typo(telegram_id: int): void
+    +handle_data(telegram_id: int, input_text: str): void
+    +handle_info_about(telegram_id: int, input_text: str): void
+    +handle_hours(telegram_id: int, input_text: str): void
+    +handle_news(telegram_id: int, input_text: str): void
+    +handle_menu(telegram_id: int, input_text: str): void
+    +send_request(telegram_id: int, input_text: str): void
+    +receive_response(response_js_str: str): void
+    +run(): void
+  }
+
+
 }
-BaseRequestInterface <|-- BookingRequest
-BaseRequestInterface <|-- MakeOrderRequest
-
-BaseRequestInterface <|-- RestaurantInfoRequest
-BaseRequestInterface <|-- MenuRequest
-BaseRequestInterface <|-- FeedbackRequest
-BaseResponseInterface <|-- ResponseSample
-'TelegramView *--
-TelegramController -right-* TelegramView
-'ResponseController -> TelegramController
-RinaAdapter -- RequestController
-RinaAdapter -- ResponseController
-ResponseController - TelegramController
-RequestController -- TelegramController
-ResponseController -- BaseResponseInterface
-RequestController - BaseRequestInterface
-
-'USER <|-- AUTHORIZED_USER
-'TelegramController --> Request
-'RMQController --> RabbitMQ
-
-@enduml
 
 
-=======
-'https://plantuml.com/class-diagram
+package "RMQ" {
+
+  class RmqController {
+    +{static}send_to_rina(message_dict: dict): None
+    +{static}send_to_tg(message_dict: dict): None
+    +{static}start_consuming_from_rina(controller): None
+    +{static}start_consuming_from_tg(controller): None
+  }
+
+  class TgConsumer {
+    +{static}start_consuming(tg_controller): None
+  }
+
+  class TgProducer {
+    +{static}produce(message_dict: dict): None
+  }
+
+  class RinaConsumer {
+    +{static}start_consuming(rina_controller): None
+  }
+
+  class RinaProducer {
+    +{static}produce(message_dict: dict): None
+  }
+
+
+}
 
 
 BaseRequestInterface <|-- MakeOrderRequest
@@ -161,63 +186,21 @@ BaseRequestInterface <|-- BookingRequest
 BaseRequestInterface <|-- RestaurantInfoRequest
 BaseRequestInterface <|-- MenuRequest
 BaseRequestInterface <|-- FeedBackRequest
-
 BaseResponseInterface <|-- ResponseSample
 BaseResponseInterface <|-- ResponseController
 
+TgController -right-* TgView
+RmqController -- RinaController
+RmqController -- TgController
+ResponseController - RinaController
+RequestController -- RinaController
+ResponseController -- BaseResponseInterface
+RequestController - BaseRequestInterface
 
-abstract class  BaseRequestInterface {
-to_json()
-}
-
-class MakeOrderRequest{
-int number_of_dishes
-to_json()
-}
-class BookingRequest{
-int table_number
-int number_of_guests
-to_json()
-}
-
-class RestaurantInfoRequest{
-str info
-to_json()
-}
-
-class MenuRequest{
-str type_of_menu
-to_json()
-}
-
-class FeedBackRequest{
-str feedback_text
-to_json()
-}
-
-
-class RequestController{
-int user_id
-BaseRequestInterface request_obj
-str request_type
-to_json()
-}
-
-abstract class BaseResponseInterface{
-from_json()
-}
-
-class ResponseSample{
-str image
-str test
-from_json()
-}
-
-class ResponseController{
-int response
-BaseResponseInterface response
-from_json()
-}
+RmqController ..> TgConsumer : Uses >
+RmqController ..> TgProducer : Uses >
+RmqController ..> RinaConsumer : Uses >
+RmqController ..> RinaProducer : Uses >
 
 
 @enduml

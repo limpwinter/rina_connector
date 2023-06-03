@@ -27,10 +27,3 @@ class ResponseController:
         self.user_id = json_file['user_id']
         js_annotation = json_file['annotation']
         self.response.from_json(js_annotation)
-
-## Example
-# model = ResponseController()
-# model.set_params({"user_id": 5, "annotation": {'image': 123, 'text': 234}})
-# print(model.response.image)
-
-## TEXT/STATUS DA NET
