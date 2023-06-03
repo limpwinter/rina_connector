@@ -4,9 +4,7 @@
 scale  2048 width
 scale  2048 height
 
-
 package "Model" {
-
   package "Json" {
     class "JsonController" {
       +dict_to_str(dictionary: Dict): str
@@ -69,8 +67,6 @@ package "Model" {
   
 }
 
-
-
 package "View" {
   class "TgView" {
     -bot: Bot
@@ -87,8 +83,6 @@ package "View" {
     +run(): void
   }
 }
-
-
 
 package "Rina" {
   class "FeedbackDatabase" {
@@ -118,8 +112,6 @@ package "Rina" {
   }
 }
 
-
-
 package "Controller" {
   
   class "TgServer" {
@@ -147,10 +139,7 @@ package "Controller" {
     +receive_response(response_js_str: str): void
     +run(): void
   }
-
-
 }
-
 
 package "RMQ" {
 
@@ -176,10 +165,7 @@ package "RMQ" {
   class RinaProducer {
     +{static}produce(message_dict: dict): None
   }
-
-
 }
-
 
 BaseRequestInterface <|-- MakeOrderRequest
 BaseRequestInterface <|-- BookingRequest
@@ -192,15 +178,17 @@ BaseResponseInterface <|-- ResponseController
 TgController -right-* TgView
 RmqController -- RinaController
 RmqController -- TgController
+RinaController --> FeedbackDatabase : Uses >
+RinaController --> TablesDatabase : Uses >
 ResponseController - RinaController
 RequestController -- RinaController
 ResponseController -- BaseResponseInterface
 RequestController - BaseRequestInterface
+JsonController -- RequestController : Uses >
+JsonController -- ResponseController : Uses >
 
 RmqController ..> TgConsumer : Uses >
 RmqController ..> TgProducer : Uses >
 RmqController ..> RinaConsumer : Uses >
 RmqController ..> RinaProducer : Uses >
-
-
 @enduml
