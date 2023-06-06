@@ -1,0 +1,35 @@
+@startuml Deployment Diagram
+!pragma layout smetana
+
+scale 2048 width
+scale 2048 height
+
+node "User Device" {
+  artifact "Telegram Bot"
+}
+
+node "Telegram Server" as TgServer {
+  artifact "TgController" 
+  artifact "TgView"
+  artifact "TgConsumer"
+  artifact "TgProducer"
+}
+
+node "RabbitMQ Server" as Rmq {
+  artifact "RmqController" 
+  artifact "RinaConsumer"
+  artifact "RinaProducer"
+}
+
+node "Rina Service" as Rina {
+  artifact "RinaController" 
+  artifact "FeedbackDatabase" 
+  artifact "TablesDatabase" 
+  artifact "RinaServer"
+}
+
+UserDevice -- TgServer : Access via Internet
+TgServer -- Rmq : Interacts via\nRMQ Message Queue
+Rmq -- Rina : Interacts via\nRMQ Message Queue
+
+@enduml
