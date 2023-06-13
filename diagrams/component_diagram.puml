@@ -1,0 +1,41 @@
+@startuml Component Diagram
+!pragma layout smetana
+
+scale 2048 width
+scale 2048 height
+
+package "Rina" {
+  [RinaController]
+  [RinaServer]
+  [FeedbackDatabase]
+  [TablesDatabase]
+}
+
+package "Telegram" {
+  [TgServer]
+  [TgController]
+  [TgView]
+  [JsonController]
+  [RequestController]
+  [ResponseController]
+}
+
+package "RMQ" {
+  [RmqController]
+  [TgConsumer]
+  [TgProducer]
+  [RinaConsumer]
+  [RinaProducer]
+}
+
+[TgController] --> [RmqController] : Sends Requests >
+[RmqController] --> [RinaController] : Forwards Requests >
+[RinaController] --> [RmqController] : Sends Responses >
+[RmqController] --> [TgController] : Forwards Responses >
+
+[RmqController] --> [TgConsumer] : Uses >
+[RmqController] --> [TgProducer] : Uses >
+[RmqController] --> [RinaConsumer] : Uses >
+[RmqController] --> [RinaProducer] : Uses >
+
+@enduml
